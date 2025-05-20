@@ -1,0 +1,152 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Page</title>
+  <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Fixed Header -->
+  <header class="head">
+    <div class="header-info">
+      <a href="{% url 'home' %}" class="logo">Job<span>Nest</span></a>
+      <nav class="nav-links">
+        <a href="#" class="active">Home</a>
+        <a href="{% url 'login_page' %}" target="_blank" class="btn login">Login</a>
+        <a href="{% url 'signup' %}" target="_blank" class="btn sign-in">Signup</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Track Your Job Hunt Like a Pro</h1>
+        <p class="subheading">
+          Your personal job search dashboard.<br />
+          Built for students, freshers, and professionals chasing their next opportunity.
+        </p>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <ul class="value-props">
+          <li>✅ Track applications Company, role, status, and notes.</li>
+          <li>🧠 Stay in control — Know where you’ve applied, what’s next, and what’s pending.</li>
+          <li>🧰 One tool, less chaos — No more spreadsheets. Just clarity.</li>
+          <li>📅 Stay Organized — Never miss a deadline or follow-up again.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="problem-solution">
+      <div class="info-container">
+        <h3>Job hunting is messy.</h3>
+        <p>Different portals. Lost deadlines. Forgotten follow-ups.</p>
+        <h3>JobNest makes it simple.</h3>
+        <p>
+          Keep everything in one clean, searchable, filterable dashboard — built for real job seekers like you.
+        </p>
+      </div>
+    </section>
+
+    <section class="feature-list">
+      <div class="features-container">
+        <h1>HOW JOBNEST WILL HELP YOU!</h1>
+        <span id="element"></span>
+      </div>
+    </section>
+
+    <section class="built-different">
+      <div class="uniq-container">
+        <h2>🧱 Built Different</h2>
+        <ul>
+          <li>Designed for real-world job seekers</li>
+          <li>UX focused — clean, fast, distraction-free</li>
+          <li>100% student-built</li>
+          <li>Privacy-first — we don’t share your data</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="testimonial-sec">
+      <h1>Testimonials</h1>
+      <div class="testimonial">
+        <div class="testi-container">
+          <blockquote>
+            “I used to forget where I applied. Now I know exactly what’s happening — and when to follow up.”<br />
+            <span>— Anjali, Software Engineering Student</span>
+          </blockquote>
+        </div>
+        <div class="testi-container">
+          <blockquote>
+            “No more spreadsheets or messy notes. JobNest keeps my job applications in one place — it just works.”<br />
+            <span>— Ravi, UX Designer</span>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="container">
+        <h2>Take control of your career.</h2>
+        <p>Start tracking smarter — with JobNest.</p>
+        <a href="{% url 'signup' %}" target="_blank"><button class="go-btn">Start Now</button></a>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+  <script>
+    var typed = new Typed("#element", {
+      strings: [
+        "Add and update job applications",
+        "Filter by status, role, or company",
+        "Personal notes on every job",
+        "Resume templates & resources",
+        "Your data, secured & private",
+        "Works great on mobile & desktop"
+      ],
+      typeSpeed: 25,
+      loop: true,
+    });
+
+
+      window.addEventListener('scroll', function() {
+      const header = document.querySelector('.head');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  </script>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-info">
+        <p>&copy; 2025 JobNest. All Rights Reserved.</p>
+        <p>
+          <a href="privacy-policy.html">Privacy Policy</a> |
+          <a href="terms-of-service.html">Terms of Service</a>
+        </p>
+      </div>
+      <div class="footer-social">
+        <a href="https://github.com/yourusername" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+        <a href="#" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
+        <a href="#" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+        <a href="#" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
+        <a href="#" target="_blank" class="social-icon insta"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
