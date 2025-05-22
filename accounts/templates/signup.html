@@ -3,18 +3,17 @@
 
 {% block title %}Signup{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup_page.css' %}">
+{% endblock %}
+
 {% block content %}
-<style>
-  @media (max-width: 767px) {
-    .signup-form-col { padding: 2rem 1rem !important; }
-  }
-</style>
-<div class="vh-100 overflow-hidden d-flex align-items-center justify-content-center" style="background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
-  <div class="row shadow-lg rounded-4 overflow-hidden flex-nowrap w-100 align-items-center justify-content-center h-100" style="max-width: 900px; background: #fff; min-height: 400px; max-height: 90vh;">
-    <div class="col-md-6 d-none d-md-flex p-0 h-100">
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
+  <div class="row shadow-lg rounded-4 overflow-hidden w-100 align-items-center justify-content-center" style="max-width: 900px; background: #fff; min-height: 400px;">
+    <div class="col-md-6 d-none d-md-flex p-0">
       <img src="{% static 'images/signup-img.jpg' %}" alt="Signup" class="img-fluid h-100 w-100 object-fit-cover">
     </div>
-    <div class="col-md-6 p-5 d-flex align-items-center justify-content-center signup-form-col h-100" style="max-height: 90vh; overflow:auto;">
+    <div class="col-md-6 p-5 d-flex align-items-center justify-content-center signup-form-col">
       <div class="w-100">
         <h2 class="mb-2 text-center text-dark">Create Your Account</h2>
         <p class="mb-4 text-center text-secondary" style="font-size:1.1rem;">Welcome! Let's get started with your new account.</p>
