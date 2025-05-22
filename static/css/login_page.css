@@ -107,6 +107,11 @@ body, html {
 .login-box button:hover {
     opacity: 0.9;
 }
+
+.login-box button:active {
+    transform: scale(0.98);
+}
+
 .create-account {
     text-align: center;
     margin-top: 20px;
@@ -116,4 +121,36 @@ body, html {
 .create-account a {
     color: #4A47E0;
     text-decoration: none;
+}
+.options label {
+    cursor: pointer;
+    user-select: none;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .left-side,
+    .right-side {
+        flex: none;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .left-side img {
+        height: auto;
+        border-radius: 0;
+    }
+
+    .login-box {
+        max-width: 100%;
+        box-shadow: none;
+        padding: 30px 20px;
+    }
 }

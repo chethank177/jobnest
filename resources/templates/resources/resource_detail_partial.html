@@ -1,0 +1,100 @@
+<!-- Resource Detail Partial - Used for modal loading -->
+<div class="resource-detail">
+  <div class="resource-header mb-4">
+    <div class="category-tag mb-2">
+      <span class="badge bg-primary">{{ resource.category }}</span>
+    </div>
+    <h3 class="resource-title">{{ resource.title }}</h3>
+    <div class="resource-meta d-flex justify-content-between align-items-center">
+      <div class="created-by">
+        <i class="bi bi-person"></i> Added by {{ resource.created_by.username }}
+      </div>
+      <div class="created-date">
+        <i class="bi bi-calendar3"></i> {{ resource.created_at|date:'F j, Y' }}
+      </div>
+    </div>
+  </div>
+
+  {% if resource.url %}
+  <div class="resource-link mb-4">
+    <a href="{{ resource.url }}" class="btn btn-outline-primary" target="_blank">
+      <i class="bi bi-link-45deg"></i> Visit Resource
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="resource-description mb-4">
+    <h5>Description</h5>
+    <div class="p-3 bg-light rounded">
+      {% if resource.description %}
+        {{ resource.description|linebreaks }}
+      {% else %}
+        <p class="text-muted">No description available.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="resource-comments mt-4">
+    <h5><i class="bi bi-chat-square-text"></i> Comments ({{ comments.count }})</h5>
+    
+    <div class="comments-container mt-3">
+      {% if comments %}
+        {% for comment in comments %}
+        <div class="comment p-3 mb-3 bg-light rounded">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div class="comment-author fw-bold">{{ comment.user.username }}</div>
+            <div class="comment-date small text-muted">{{ comment.created_at|date:'M d, Y' }}</div>
+          </div>
+          <div class="comment-content">
+            {{ comment.content }}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">No comments yet. Be the first to comment!</p>
+      {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="add-comment mt-4">
+      <h6>Add a comment</h6>
+      <form method="post" action="{% url 'resources:add_comment' resource.id %}" class="comment-form">
+        {% csrf_token %}
+        <div class="mb-3">
+          <textarea name="content" class="form-control" rows="3" placeholder="Write your comment here..." required></textarea>
+        </div>
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">Post Comment</button>
+        </div>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.resource-title {
+  font-weight: 600;
+  color: #2b3445;
+}
+
+.resource-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.comments-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment {
+  transition: background-color 0.2s;
+}
+
+.comment:hover {
+  background-color: #e9ecef !important;
+}
+</style> 

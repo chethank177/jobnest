@@ -1,0 +1,676 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Resources | JobNest{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Resources</h2>
+    {% if user.is_staff %}
+      <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#resourceAddModal"><i class="bi bi-plus-circle"></i> Add Resource</a>
+    {% endif %}
+  </div>
+  
+  <!-- Category Filter Tabs -->
+  <div class="category-tabs-container mb-4">
+    <div class="category-tabs">
+      <button class="category-tab active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" aria-controls="all" aria-selected="true">
+        <span class="category-icon"><i class="bi bi-grid"></i></span>
+        <span class="category-name">All</span>
+      </button>
+      {% for cat_code, cat_name in categories %}
+      <button class="category-tab" id="tab-{{ cat_code }}" data-bs-toggle="tab" data-bs-target="#tab-content-{{ cat_code }}">
+        <span class="category-icon">
+          {% if cat_code == 'Resume' %}
+            <i class="bi bi-file-earmark-person"></i>
+          {% elif cat_code == 'Job Portal' %}
+            <i class="bi bi-globe"></i>
+          {% elif cat_code == 'Interview' %}
+            <i class="bi bi-people"></i>
+          {% elif cat_code == 'Cover Letter' %}
+            <i class="bi bi-envelope"></i>
+          {% else %}
+            <i class="bi bi-folder"></i>
+          {% endif %}
+        </span>
+        <span class="category-name">{{ cat_name }}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+  
+  <!-- Tab Content -->
+  <div class="tab-content" id="resourceTabContent">
+    <!-- All Resources Tab -->
+    <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+      <div class="row g-4">
+        {% for cat, resources in grouped.items %}
+          {% for resource in resources %}
+            <div class="col-12 col-md-6 col-lg-4 resource-card-wrapper">
+              <div class="card h-100 resource-card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ resource.title }}</h5>
+                  <p class="card-text description-preview">
+                    {% if resource.description %}
+                      {{ resource.description|truncatechars:200 }}
+                    {% else %}
+                      No description available.
+                    {% endif %}
+                  </p>
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    <a href="{% url 'resources:resource_detail' resource.pk %}" class="btn btn-primary read-more-btn" target="_blank">Read More</a>
+                    <small class="text-muted">{{ resource.created_at|date:'M d, Y' }}</small>
+                  </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="author"><i class="bi bi-person"></i> {{ resource.created_by.username }}</span>
+                    <span class="comments-count"><i class="bi bi-chat-dots"></i> {{ resource.comments.count }}</span>
+                  </div>
+                  
+                  {% if user.is_staff %}
+                  <div class="mt-2 d-flex gap-2 justify-content-end">
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resourceEditModal{{ resource.pk }}"><i class="bi bi-pencil"></i> Edit</button>
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resourceDeleteModal{{ resource.pk }}"><i class="bi bi-trash"></i> Delete</button>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+    
+    <!-- Individual Category Tabs -->
+    {% for cat_code, cat_name in categories %}
+    <div class="tab-pane fade" id="tab-content-{{ cat_code }}" role="tabpanel" aria-labelledby="tab-{{ cat_code }}">
+      <div class="row g-4">
+        {% with has_resources=False %}
+          <!-- Find resources for this category -->
+          {% for cat, resources in grouped.items %}
+            {% if cat == cat_code %}
+              {% if resources %}
+                {% with has_resources=True %}
+                  {% for resource in resources %}
+                    <div class="col-12 col-md-6 col-lg-4 resource-card-wrapper">
+                      <div class="card h-100 resource-card">
+                        <div class="card-body">
+                          <h5 class="card-title">{{ resource.title }}</h5>
+                          <p class="card-text description-preview">
+                            {% if resource.description %}
+                              {{ resource.description|truncatechars:200 }}
+                            {% else %}
+                              No description available.
+                            {% endif %}
+                          </p>
+                          <div class="d-flex justify-content-between align-items-center mt-3">
+                            <a href="{% url 'resources:resource_detail' resource.pk %}" class="btn btn-primary read-more-btn" target="_blank">Read More</a>
+                            <small class="text-muted">{{ resource.created_at|date:'M d, Y' }}</small>
+                          </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <span class="author"><i class="bi bi-person"></i> {{ resource.created_by.username }}</span>
+                            <span class="comments-count"><i class="bi bi-chat-dots"></i> {{ resource.comments.count }}</span>
+                          </div>
+                          
+                          {% if user.is_staff %}
+                          <div class="mt-2 d-flex gap-2 justify-content-end">
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resourceEditModal{{ resource.pk }}"><i class="bi bi-pencil"></i> Edit</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resourceDeleteModal{{ resource.pk }}"><i class="bi bi-trash"></i> Delete</button>
+                          </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endwith %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          
+          {% if has_resources == False %}
+            <div class="col-12 text-center py-5">
+              <p class="text-muted">No resources available in this category.</p>
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# Add Modal #}
+  {% if user.is_staff %}
+    <div class="modal fade" id="resourceAddModal" tabindex="-1" aria-labelledby="resourceAddModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="resourceAddModalLabel">Add Resource</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="post" action="{% url 'resources:resource_add' %}" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="id_title" class="form-label">Title</label>
+                <input type="text" name="title" class="form-control" id="id_title" required>
+              </div>
+              <div class="mb-3">
+                <label for="id_description" class="form-label">Description</label>
+                <textarea name="description" class="form-control" id="id_description" rows="2"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="id_url" class="form-label">URL (optional)</label>
+                <input type="url" name="url" class="form-control" id="id_url">
+              </div>
+              <div class="mb-3">
+                <label for="id_category" class="form-label">Category</label>
+                <select name="category" class="form-select" id="id_category" required>
+                  <option value="">Select a category</option>
+                  <option value="Resume">Resume</option>
+                  <option value="Job Portal">Job Portal</option>
+                  <option value="Interview">Interview</option>
+                  <option value="Cover Letter">Cover Letter</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">Add Resource</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Resource Detail Modal -->
+<div class="modal fade" id="resourceDetailModal" tabindex="-1" aria-labelledby="resourceDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resourceDetailModalLabel">Resource Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="resourceDetailContent">
+        <!-- Content will be loaded via JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{# After the card grid, render all modals for staff #}
+{% if user.is_staff %}
+  {% for cat, resources in grouped.items %}
+    {% for resource in resources %}
+      <div class="modal fade" id="resourceEditModal{{ resource.pk }}" tabindex="-1" aria-labelledby="resourceEditModalLabel{{ resource.pk }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="resourceEditModalLabel{{ resource.pk }}">Edit Resource</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form method="post" action="{% url 'resources:resource_edit' resource.pk %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="id_title_{{ resource.pk }}" class="form-label">Title</label>
+                  <input type="text" name="title" class="form-control" id="id_title_{{ resource.pk }}" value="{{ resource.title }}" required>
+                </div>
+                <div class="mb-3">
+                  <label for="id_description_{{ resource.pk }}" class="form-label">Description</label>
+                  <textarea name="description" class="form-control" id="id_description_{{ resource.pk }}" rows="2">{{ resource.description }}</textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="id_url_{{ resource.pk }}" class="form-label">URL (optional)</label>
+                  <input type="url" name="url" class="form-control" id="id_url_{{ resource.pk }}" value="{{ resource.url|default:'' }}">
+                </div>
+                <div class="mb-3">
+                  <label for="id_category_{{ resource.pk }}" class="form-label">Category</label>
+                  <select name="category" class="form-select" id="id_category_{{ resource.pk }}" required>
+                    <option value="">Select a category</option>
+                    {% for choice in resource.CATEGORY_CHOICES %}
+                      <option value="{{ choice.0 }}" {% if resource.category == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="resourceDeleteModal{{ resource.pk }}" tabindex="-1" aria-labelledby="resourceDeleteModalLabel{{ resource.pk }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="resourceDeleteModalLabel{{ resource.pk }}">Delete Resource</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form method="post" action="{% url 'resources:resource_delete' resource.pk %}">
+                {% csrf_token %}
+                <p>Are you sure you want to delete <strong>{{ resource.title }}</strong>?</p>
+                <div class="d-flex justify-content-end gap-2">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+{% endif %}
+
+<style>
+body {
+  background-color: #f5f7fa;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* New Category Tabs Styling */
+.category-tabs-container {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  margin-bottom: 2rem;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+  border-radius: 15px;
+  background: white;
+  padding: 10px;
+}
+
+.category-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-width: max-content;
+  padding: 0.75rem;
+}
+
+.category-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  height: 90px;
+  border-radius: 12px;
+  padding: 0.75rem;
+  border: none;
+  background-color: #f8f9fa;
+  color: #222 !important;
+  font-weight: 700;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.category-tab:hover {
+  background-color: #e9ecef;
+  transform: translateY(-3px);
+  color: #0d6efd !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.category-tab::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  bottom: 0;
+  left: 0;
+  background-color: #0d6efd;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.category-tab:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.category-tab.active {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.15);
+}
+
+.category-tab.active::before {
+  transform: scaleX(1);
+  background-color: white;
+}
+
+.category-tab.active .category-icon,
+.category-tab.active .category-name {
+  color: #fff !important;
+}
+
+.category-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.category-tab:hover .category-icon {
+  transform: scale(1.2);
+}
+
+.category-tab .category-name {
+  color: #222 !important;
+  font-weight: 700;
+  text-shadow: 0 1px 0 #fff, 0 0 2px #fff;
+}
+
+.category-tab.active .category-name,
+.category-tab:focus .category-name,
+.category-tab:hover .category-name {
+  color: #fff !important;
+  text-shadow: 0 1px 2px #0d6efd, 0 0 2px #0d6efd;
+}
+
+.category-tab .category-icon {
+  color: inherit !important;
+}
+
+/* Custom colors for categories */
+.category-tab[id="tab-Resume"] {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+.category-tab[id="tab-Resume"] .category-icon {
+  color: #28a745;
+}
+.category-tab[id="tab-Resume"]:hover {
+  background-color: rgba(40, 167, 69, 0.15);
+}
+
+.category-tab[id="tab-Job Portal"] {
+  background-color: rgba(111, 66, 193, 0.1);
+}
+.category-tab[id="tab-Job Portal"] .category-icon {
+  color: #6f42c1;
+}
+.category-tab[id="tab-Job Portal"]:hover {
+  background-color: rgba(111, 66, 193, 0.15);
+}
+
+.category-tab[id="tab-Interview"] {
+  background-color: rgba(253, 126, 20, 0.1);
+}
+.category-tab[id="tab-Interview"] .category-icon {
+  color: #fd7e14;
+}
+.category-tab[id="tab-Interview"]:hover {
+  background-color: rgba(253, 126, 20, 0.15);
+}
+
+.category-tab[id="tab-Cover Letter"] {
+  background-color: rgba(32, 201, 151, 0.1);
+}
+.category-tab[id="tab-Cover Letter"] .category-icon {
+  color: #20c997;
+}
+.category-tab[id="tab-Cover Letter"]:hover {
+  background-color: rgba(32, 201, 151, 0.15);
+}
+
+.category-tab[id="tab-Other"] {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+.category-tab[id="tab-Other"] .category-icon {
+  color: #0d6efd;
+}
+.category-tab[id="tab-Other"]:hover {
+  background-color: rgba(13, 110, 253, 0.15);
+}
+
+.category-tab[id="all-tab"] {
+  background-color: rgba(108, 117, 125, 0.1);
+}
+.category-tab[id="all-tab"] .category-icon {
+  color: #6c757d;
+}
+.category-tab[id="all-tab"]:hover {
+  background-color: rgba(108, 117, 125, 0.15);
+}
+
+/* Resource Cards Styling */
+.resource-card-wrapper {
+  perspective: 1000px;
+}
+
+.resource-card {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+  border-radius: 10px;
+  overflow: hidden;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.resource-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.resource-img-container {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.resource-img-container img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.category-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  padding: 0.35em 0.8em;
+}
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #2b3445;
+}
+
+.description-preview {
+  color: #666;
+  line-height: 1.5;
+  max-height: 4.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.read-more-btn {
+  border-radius: 20px;
+  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.read-more-btn:hover {
+  transform: translateY(-2px);
+}
+
+.card-footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.author, .comments-count {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .resource-card {
+    max-width: 100%;
+  }
+  
+  .category-tabs-container {
+    padding: 8px;
+  }
+  
+  .category-tabs {
+    gap: 10px;
+    padding: 0.5rem;
+  }
+  
+  .category-tab {
+    min-width: 85px;
+    height: 80px;
+    padding: 0.5rem;
+  }
+  
+  .category-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .category-name {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-tabs-container {
+    padding: 5px;
+  }
+  
+  .category-tabs {
+    gap: 8px;
+    padding: 0.4rem;
+  }
+  
+  .category-tab {
+    min-width: 70px;
+    height: 70px;
+    padding: 0.4rem;
+  }
+  
+  .category-icon {
+    font-size: 1.25rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .category-name {
+    font-size: 0.75rem;
+  }
+}
+</style>
+
+<script>
+// CSRF helper
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const csrftoken = getCookie('csrftoken');
+  
+  // Initialize category tabs with proper Bootstrap functionality
+  document.querySelectorAll('.category-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      // Remove active class from all tabs
+      document.querySelectorAll('.category-tab').forEach(t => {
+        t.classList.remove('active');
+      });
+      
+      // Add active class to clicked tab
+      this.classList.add('active');
+      
+      // Get the tab target
+      const targetId = this.getAttribute('data-bs-target');
+      
+      // Hide all tab contents
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
+      });
+      
+      // Show the target tab content
+      const targetPane = document.querySelector(targetId);
+      if (targetPane) {
+        targetPane.classList.add('show', 'active');
+      }
+    });
+  });
+  
+  // Check if there's a resource_id in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const resourceId = urlParams.get('resource_id');
+  
+  if (resourceId) {
+    // Show the resource detail modal
+    const detailModal = new bootstrap.Modal(document.getElementById('resourceDetailModal'));
+    
+    // Get the resource details
+    fetch(`/resources/detail/${resourceId}/`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then(html => {
+        document.getElementById('resourceDetailContent').innerHTML = html;
+        detailModal.show();
+      })
+      .catch(error => {
+        console.error('Error fetching resource details:', error);
+        // Redirect to full page view as fallback
+        window.location.href = `/resources/detail/${resourceId}/`;
+      });
+  }
+  
+  // Add click event to Read More buttons
+  document.querySelectorAll('.read-more-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      // Allow the default behavior (open in new tab)
+      // The correct URL is already set in the href attribute
+    });
+  });
+});
+</script>
+{% endblock %} 

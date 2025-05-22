@@ -1,3 +1,4 @@
+{% extends 'minimal_base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +35,7 @@
                     <button type="submit" href="#">SUBMIT</button>
                 </form>
                 <div class="create-account">
-                    <a href="{% url 'signup' %}">Create Account</a>
+                    <a href="{% url 'accounts:signup' %}">Create Account</a>
                 </div>
             </div>
         </div>

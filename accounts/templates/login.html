@@ -1,0 +1,77 @@
+{% extends 'minimal_base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+  @media (max-width: 767px) {
+    .login-form-col { padding: 2rem 1rem !important; }
+  }
+  .btn-admin {
+    background-color: #2c3e50;
+    color: white;
+  }
+  .btn-admin:hover {
+    background-color: #34495e;
+    color: white;
+  }
+  .login-buttons {
+    gap: 1rem;
+  }
+</style>
+<div class="vh-100 overflow-hidden d-flex align-items-center justify-content-center" style="background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
+  <div class="row shadow-lg rounded-4 overflow-hidden flex-nowrap w-100 align-items-center justify-content-center h-100" style="max-width: 900px; background: #fff; min-height: 400px; max-height: 90vh;">
+    <div class="col-md-6 d-none d-md-flex p-0 h-100">
+      <img src="{% static 'images/loginpage-img.jpg' %}" alt="Login" class="img-fluid h-100 w-100 object-fit-cover">
+    </div>
+    <div class="col-md-6 p-5 d-flex align-items-center justify-content-center login-form-col h-100" style="max-height: 90vh; overflow:auto;">
+      <div class="w-100">
+        <h2 class="mb-2 text-center text-dark">Welcome to JobNest</h2>
+        <p class="mb-4 text-center text-secondary" style="font-size:1.1rem;">Please select your login type</p>
+        
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="d-flex justify-content-center login-buttons mb-4">
+          <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#userLoginForm" aria-expanded="true">
+            <i class="bi bi-person-fill me-2"></i>User Login
+          </button>
+          <a href="/admin/" class="btn btn-admin">
+            <i class="bi bi-shield-lock-fill me-2"></i>Admin Panel
+          </a>
+        </div>
+
+        <div class="collapse show" id="userLoginForm">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="username" class="form-label" style="color:#222;">Username</label>
+              <input type="text" class="form-control" name="username" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label" style="color:#222;">Password</label>
+              <input type="password" class="form-control" name="password" required>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember">
+                <label class="form-check-label" for="remember" style="color:#222;">Remember me</label>
+              </div>
+              <a href="{% url 'accounts:forgot_password' %}" class="text-decoration-none">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <p class="mt-3 text-center text-dark">Don't have an account? <a href="{% url 'accounts:signup' %}">Create one</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

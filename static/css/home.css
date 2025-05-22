@@ -321,3 +321,70 @@ footer {
 .social-icon:hover {
     color: #007bff;
 }
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .features ul,
+  .built-different ul {
+    grid-template-columns: 1fr; /* Stack on small screens */
+  }
+
+  .testi-container {
+    width: 100%;
+    flex-direction: column;
+  }
+}
+
+/* Job Tracker Dashboard Styles */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.add-job-btn {
+  background: #2563eb;
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.job-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+.job-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 1.5rem;
+  position: relative;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.status {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.3rem 1rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+}
+.status.applied { background: #22c55e; }
+.status.interviewing { background: #fbbf24; }
+.status.offer { background: #f59e42; }
+.status.rejected { background: #ef4444; }
+

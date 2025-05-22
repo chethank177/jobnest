@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Welcome | JobNest{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">Welcome to JobNest — Your personal job application assistant.</h1>
+    <p class="lead mt-3 animate__animated animate__fadeIn animate__delay-1s">Organize, track, and plan your career journey with ease.</p>
+  </div>
+  <div class="row g-4 justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0 animate__animated animate__fadeInUp animate__delay-1s h-100">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="bi bi-journal-check display-4 text-primary"></i>
+          </div>
+          <h5 class="card-title fw-bold">Track all your job applications in one place</h5>
+          <p class="card-text">No more spreadsheets! Easily add, update, and manage every job you apply for.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0 animate__animated animate__fadeInUp animate__delay-2s h-100">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="bi bi-calendar-check display-4 text-success"></i>
+          </div>
+          <h5 class="card-title fw-bold">Stay updated on your interview status</h5>
+          <p class="card-text">See which applications are in progress, which have offers, and which need follow-up.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0 animate__animated animate__fadeInUp animate__delay-3s h-100">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="bi bi-lightbulb display-4 text-warning"></i>
+          </div>
+          <h5 class="card-title fw-bold">Plan your next career move smartly</h5>
+          <p class="card-text">Use JobNest to strategize your job search and land your dream role faster.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

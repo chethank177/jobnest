@@ -1,0 +1,51 @@
+{% extends 'minimal_base.html' %}
+{% load static %}
+
+{% block title %}Signup{% endblock %}
+
+{% block content %}
+<style>
+  @media (max-width: 767px) {
+    .signup-form-col { padding: 2rem 1rem !important; }
+  }
+</style>
+<div class="vh-100 overflow-hidden d-flex align-items-center justify-content-center" style="background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
+  <div class="row shadow-lg rounded-4 overflow-hidden flex-nowrap w-100 align-items-center justify-content-center h-100" style="max-width: 900px; background: #fff; min-height: 400px; max-height: 90vh;">
+    <div class="col-md-6 d-none d-md-flex p-0 h-100">
+      <img src="{% static 'images/signup-img.jpg' %}" alt="Signup" class="img-fluid h-100 w-100 object-fit-cover">
+    </div>
+    <div class="col-md-6 p-5 d-flex align-items-center justify-content-center signup-form-col h-100" style="max-height: 90vh; overflow:auto;">
+      <div class="w-100">
+        <h2 class="mb-2 text-center text-dark">Create Your Account</h2>
+        <p class="mb-4 text-center text-secondary" style="font-size:1.1rem;">Welcome! Let's get started with your new account.</p>
+        <form method="POST">
+          {% csrf_token %}
+          {% if messages %}
+          {% for message in messages %}
+              <div class="alert alert-warning">{{ message }}</div>
+          {% endfor %}
+          {% endif %}
+          <div class="mb-3">
+            <label for="username" class="form-label" style="color:#222;">Username</label>
+            <input type="text" class="form-control" name="username" required />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label" style="color:#222;">Email</label>
+            <input type="email" class="form-control" name="email" required />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label" style="color:#222;">Password</label>
+            <input type="password" class="form-control" name="password" required />
+          </div>
+          <div class="mb-3">
+            <label for="confirm_password" class="form-label" style="color:#222;">Confirm Password</label>
+            <input type="password" class="form-control" name="confirm_password" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+        </form>
+        <p class="mt-3 text-center text-dark">Already have an account? <a href="{% url 'accounts:login' %}">Login</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

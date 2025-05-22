@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard | JobNest{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div id="dashboard-messages"></div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Job Applications</h2>
+    <div>
+      <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#filterModal"><i class="bi bi-funnel"></i> Filter</button>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobModal">Add Job</button>
+    </div>
+  </div>
+  <!-- Filter Modal -->
+  <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="get" id="filter-form">
+          <div class="modal-header bg-light">
+            <h5 class="modal-title" id="filterModalLabel">Filter Jobs</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Job Role</label>
+              <div class="row">
+                {% for role in all_roles %}
+                <div class="col-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="role" value="{{ role }}" id="role-{{ forloop.counter }}" {% if role in filter_roles %}checked{% endif %}>
+                    <label class="form-check-label" for="role-{{ forloop.counter }}">{{ role }}</label>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Status</label>
+              <div class="row">
+                {% for s in status_choices %}
+                <div class="col-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="status" value="{{ s }}" id="status-{{ s }}" {% if s in filter_statuses %}checked{% endif %}>
+                    <label class="form-check-label" for="status-{{ s }}">{{ s|capfirst }}</label>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <div class="col-6">
+                <label class="form-label">Month</label>
+                <select class="form-select" name="month">
+                  <option value="">All</option>
+                  {% for m in month_choices %}
+                  <option value="{{ m.0 }}" {% if filter_month == m.0|stringformat:'i' %}selected{% endif %}>{{ m.1 }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Year</label>
+                <select class="form-select" name="year">
+                  <option value="">All</option>
+                  {% for y in all_years %}
+                  <option value="{{ y.year }}" {% if filter_year == y.year|stringformat:'i' %}selected{% endif %}>{{ y.year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ request.path }}'">Clear</button>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- End Filter Modal -->
+  <div id="job-cards-row" class="row g-4">
+    {% for job in jobs %}
+    <div class="col-md-6 col-lg-4 job-card-col" id="job-card-{{ job.id }}">
+      <div class="card shadow-lg border-0 h-100 rounded-4">
+        <div class="card-body d-flex flex-column position-relative">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h5 class="card-title fw-bold mb-1">{{ job.role }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
+            </div>
+            <span class="badge position-absolute top-0 end-0 mt-3 me-3 px-3 py-2 fs-6
+              {% if job.status == 'applied' %}bg-success
+              {% elif job.status == 'interviewing' %}bg-info text-dark
+              {% elif job.status == 'offer' %}bg-warning text-dark
+              {% elif job.status == 'rejected' %}bg-danger
+              {% endif %}"
+              id="status-badge-{{ job.id }}">
+              {{ job.get_status_display }}
+            </span>
+          </div>
+          <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-{{ job.id }}">{{ job.date_applied }}</span></p>
+          {% if job.notes %}<p class="mb-2 small text-secondary"><i class="bi bi-chat-left-text me-1"></i> <span id="notes-{{ job.id }}">{{ job.notes }}</span></p>{% endif %}
+          <div class="mt-auto d-flex gap-2 justify-content-end">
+            {% if job.job_url %}
+              <a href="{{ job.job_url }}" target="_blank" class="btn btn-outline-primary btn-sm" id="job-url-btn-{{ job.id }}"><i class="bi bi-box-arrow-up-right"></i> View Job</a>
+            {% endif %}
+            <button class="btn btn-outline-secondary btn-sm edit-job-btn" data-bs-toggle="modal" data-bs-target="#editJobModal" data-job-id="{{ job.id }}"><i class="bi bi-pencil"></i> Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if not jobs %}
+    <div class="text-center py-5">
+      <div class="alert alert-info d-inline-block px-4 py-3 shadow-sm">
+        <h4 class="mb-2">You haven't added any job applications yet.</h4>
+        <p class="mb-0">Start tracking your career journey with <strong>JobNest</strong>.</p>
+        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addJobModal">Add Your First Job</button>
+      </div>
+    </div>
+  {% endif %}
+</div>
+<!-- Add Job Modal -->
+<div class="modal fade" id="addJobModal" tabindex="-1" aria-labelledby="addJobModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="add-job-form" method="post" novalidate autocomplete="off">
+        {% csrf_token %}
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="addJobModalLabel">Add Job Application</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="add-form-errors"></div>
+          <div class="mb-3">
+            <label class="form-label">Job Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="role" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Company Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="company" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Status <span class="text-danger">*</span></label>
+            <select class="form-select" name="status" required>
+              <option value="applied">Applied</option>
+              <option value="interviewing">Interviewing</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Application Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="date_applied" required max="{{ today_date }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Job URL <span class="text-muted">(optional)</span></label>
+            <input type="url" class="form-control" name="job_url">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="notes"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Job</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Edit Job Modal (single, populated by JS) -->
+<div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="edit-job-form" method="post" novalidate autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="job_id" id="edit-job-id">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title" id="editJobModalLabel">Edit Job</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="edit-form-errors"></div>
+          <div class="mb-3">
+            <label class="form-label">Job Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="role" id="edit-role" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Company Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="company" id="edit-company" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Status <span class="text-danger">*</span></label>
+            <select class="form-select" name="status" id="edit-status" required>
+              <option value="applied">Applied</option>
+              <option value="interviewing">Interviewing</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Application Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="date_applied" id="edit-date-applied" required max="{{ today_date }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Job URL <span class="text-muted">(optional)</span></label>
+            <input type="url" class="form-control" name="job_url" id="edit-job-url">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="notes" id="edit-notes"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-danger" id="delete-job-btn">Delete</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+// Helper: show messages
+function showMessage(msg, type="success") {
+  const html = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+  document.getElementById('dashboard-messages').innerHTML = html;
+}
+// CSRF helper
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+// Add Job AJAX
+const addJobForm = document.getElementById('add-job-form');
+addJobForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(addJobForm);
+  fetch("", {
+    method: "POST",
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+    body: formData
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      // Add card to grid
+      const job = data.job;
+      const cardHtml = renderJobCard(job);
+      document.getElementById('job-cards-row').insertAdjacentHTML('afterbegin', cardHtml);
+      // Hide modal, clear form
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('addJobModal')).hide();
+      addJobForm.reset();
+      document.getElementById('add-form-errors').innerHTML = '';
+      showMessage('Job added successfully!','success');
+      updateProfileStats();
+    } else {
+      showFormErrors('add-form-errors', data.errors);
+    }
+  });
+});
+// Edit Job Modal populate
+const editJobModal = document.getElementById('editJobModal');
+editJobModal.addEventListener('show.bs.modal', function(event) {
+  const btn = event.relatedTarget;
+  const jobId = btn.getAttribute('data-job-id');
+  // Get card data
+  const card = document.getElementById('job-card-' + jobId);
+  document.getElementById('edit-job-id').value = jobId;
+  document.getElementById('edit-role').value = card.querySelector('.card-title').textContent.trim();
+  document.getElementById('edit-company').value = card.querySelector('.card-subtitle').textContent.trim();
+  document.getElementById('edit-status').value = card.querySelector('.badge').textContent.trim().toLowerCase();
+  
+  // Format date for the date input (YYYY-MM-DD)
+  const dateText = card.querySelector('[id^="date-applied-"]').textContent.trim();
+  // Convert any date format to YYYY-MM-DD
+  const date = new Date(dateText);
+  const formattedDate = date.getFullYear() + '-' + 
+                       String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(date.getDate()).padStart(2, '0');
+  document.getElementById('edit-date-applied').value = formattedDate;
+  
+  document.getElementById('edit-job-url').value = card.querySelector('a[id^="job-url-btn-"]') ? card.querySelector('a[id^="job-url-btn-"]').getAttribute('href') : '';
+  document.getElementById('edit-notes').value = card.querySelector('[id^="notes-"]') ? card.querySelector('[id^="notes-"]').textContent.trim() : '';
+  document.getElementById('edit-form-errors').innerHTML = '';
+});
+// Edit Job AJAX
+const editJobForm = document.getElementById('edit-job-form');
+editJobForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(editJobForm);
+  fetch("", {
+    method: "POST",
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+    body: formData
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      // Update card
+      updateJobCard(data.job);
+      bootstrap.Modal.getOrCreateInstance(editJobModal).hide();
+      showMessage('Job updated successfully!','success');
+      updateProfileStats();
+    } else {
+      showFormErrors('edit-form-errors', data.errors);
+    }
+  });
+});
+// Delete Job AJAX
+const deleteBtn = document.getElementById('delete-job-btn');
+deleteBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  const jobId = document.getElementById('edit-job-id').value;
+  const formData = new FormData();
+  formData.append('delete_job_id', jobId);
+  fetch("", {
+    method: "POST",
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+    body: formData
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      // Remove card
+      const card = document.getElementById('job-card-' + jobId);
+      if (card) card.remove();
+      bootstrap.Modal.getOrCreateInstance(editJobModal).hide();
+      showMessage('Job deleted successfully!','success');
+      updateProfileStats();
+    }
+  });
+});
+// Render job card HTML
+function renderJobCard(job) {
+  let badgeClass = 'bg-success';
+  let badgeText = job.status_display;
+  if (job.status === 'interviewing') badgeClass = 'bg-info text-dark';
+  else if (job.status === 'offer') badgeClass = 'bg-warning text-dark';
+  else if (job.status === 'rejected') badgeClass = 'bg-danger';
+  return `<div class="col-md-6 col-lg-4 job-card-col" id="job-card-${job.id}">
+    <div class="card shadow-lg border-0 h-100 rounded-4">
+      <div class="card-body d-flex flex-column position-relative">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="card-title fw-bold mb-1">${job.role}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">${job.company}</h6>
+          </div>
+          <span class="badge position-absolute top-0 end-0 mt-3 me-3 px-3 py-2 fs-6 ${badgeClass}" id="status-badge-${job.id}">${badgeText}</span>
+        </div>
+        <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-${job.id}">${job.date_applied}</span></p>
+        ${job.notes ? `<p class="mb-2 small text-secondary"><i class="bi bi-chat-left-text me-1"></i> <span id="notes-${job.id}">${job.notes}</span></p>` : ''}
+        <div class="mt-auto d-flex gap-2 justify-content-end">
+          ${job.job_url ? `<a href="${job.job_url}" target="_blank" class="btn btn-outline-primary btn-sm" id="job-url-btn-${job.id}"><i class="bi bi-box-arrow-up-right"></i> View Job</a>` : ''}
+          <button class="btn btn-outline-secondary btn-sm edit-job-btn" data-bs-toggle="modal" data-bs-target="#editJobModal" data-job-id="${job.id}"><i class="bi bi-pencil"></i> Edit</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+// Update job card in DOM
+function updateJobCard(job) {
+  const card = document.getElementById('job-card-' + job.id);
+  if (!card) return;
+  card.outerHTML = renderJobCard(job);
+}
+// Show form errors
+function showFormErrors(containerId, errors) {
+  let html = '<div class="alert alert-danger">';
+  for (const field in errors) {
+    html += `<div>${errors[field][0]}</div>`;
+  }
+  html += '</div>';
+  document.getElementById(containerId).innerHTML = html;
+}
+// Re-bind edit buttons after DOM update
+function rebindEditButtons() {
+  document.querySelectorAll('.edit-job-btn').forEach(btn => {
+    btn.removeEventListener('click', editBtnHandler);
+    btn.addEventListener('click', editBtnHandler);
+  });
+}
+function editBtnHandler(e) {
+  // handled by Bootstrap modal event
+}
+document.addEventListener('DOMContentLoaded', rebindEditButtons);
+document.addEventListener('DOMNodeInserted', rebindEditButtons);
+
+function updateProfileStats() {
+  fetch('/tracker/profile-stats/')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('total-applications').textContent = data.total;
+      document.getElementById('monthly-applications').textContent = data.monthly;
+      document.getElementById('active-applications').textContent = data.active;
+      document.getElementById('total-offers').textContent = data.offers;
+    });
+}
+
+// Example: Call updateProfileStats after successful add/edit job AJAX
+// You should call this in your AJAX success handlers for add/edit job
+// For demonstration, here is a global event listener:
+document.addEventListener('job-updated', updateProfileStats);
+
+// In your AJAX success for add/edit job, add:
+// document.dispatchEvent(new Event('job-updated'));
+</script>
+{% endblock %} 

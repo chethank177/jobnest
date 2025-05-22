@@ -1,0 +1,409 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %} Django App {% endblock %}</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/custom_css.css' %}" />
+    <style>
+      .navbar-nav .nav-link.active {
+        color: #ffc107 !important;
+        font-weight: bold;
+        border-bottom: 2px solid #ffc107;
+      }
+      .navbar-nav .nav-link {
+        transition: color 0.2s, background 0.2s;
+      }
+      .navbar-nav .nav-link:hover {
+        color: #fff !important;
+        background: #343a40;
+        border-radius: 6px;
+      }
+    </style>
+    {% block extra_css %} {% endblock %}
+  </head>
+  <body>
+    <!-- Header / Navbar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top"
+    >
+      <div class="container-fluid px-4">
+        <!-- Brand aligned left -->
+        <a class="navbar-brand d-flex align-items-center me-5" href="/" style="font-size: 2rem; font-weight: bold; letter-spacing: 1px;">
+          <span class="bg-gradient bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-2 shadow" style="width: 40px; height: 40px; font-size: 1.5rem;">
+            <i class="bi bi-briefcase-fill"></i>
+          </span>
+          <span class="text-warning" style="text-shadow: 1px 1px 6px #000, 0 0 2px #ffc107;">JobNest</span>
+        </a>
+
+        <!-- Mobile menu button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Nav items aligned right -->
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav ms-lg-7 ms-5">
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/home/' %}active{% endif %}"
+                 href="{% if user.is_authenticated %}{% url 'after_login_homepage' %}{% else %}/{% endif %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if '/tracker/' in request.path %}active{% endif %}" href="{% url 'tracker:dashboard' %}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/resources/' %}active{% endif %}" href="{% url 'resources:resource_list' %}">Resources</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center border border-2 border-white shadow" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                  {{ user.first_name|default:user.username|first|upper }}
+                </span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow-lg p-0 border-0" aria-labelledby="profileDropdown" style="min-width: 220px; border-radius: 1rem; overflow: hidden;">
+                <li class="bg-light px-3 py-2">
+                  <div class="d-flex align-items-center mb-1">
+                    <span class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center border border-2 border-white shadow me-2" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                      {{ user.first_name|default:user.username|first|upper }}
+                    </span>
+                    <div>
+                      <div class="fw-bold small">{{ user.get_full_name|default:user.username }}</div>
+                      <div class="text-muted small">{{ user.email }}</div>
+                    </div>
+                  </div>
+                </li>
+                <li><hr class="dropdown-divider m-0"></li>
+                <li>
+                  <button class="dropdown-item d-flex align-items-center py-2" data-bs-toggle="modal" data-bs-target="#accountModal">
+                    <i class="bi bi-person me-2"></i> <span class="fw-semibold small">My account</span>
+                  </button>
+                </li>
+                <li>
+                  <form method="post" action="{% url 'accounts:logout' %}" id="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item d-flex align-items-center py-2">
+                      <i class="bi bi-box-arrow-right me-2"></i> <span class="fw-semibold small">Sign out</span>
+                    </button>
+                  </form>
+                </li>
+                <li class="dropdown-item text-center text-muted small pt-2 pb-2 bg-light border-top">Secured by <b>JobNest</b></li>
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/accounts/login/' %}active{% endif %}" href="{% url 'accounts:login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/accounts/signup/' %}active{% endif %}" href="{% url 'accounts:signup' %}">Signup</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- My Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-light">
+            <h5 class="modal-title" id="accountModalLabel">My Account</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- User Info Section -->
+            <div class="d-flex align-items-center mb-4">
+              <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center me-3" style="width: 64px; height: 64px; font-size: 1.75rem;">
+                {{ user.first_name|default:user.username|first|upper }}
+              </div>
+              <div>
+                <div class="fw-bold fs-4">{{ user.get_full_name|default:user.username }}</div>
+                <div class="text-muted">{{ user.email }}</div>
+              </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div class="card border-0 bg-light h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-briefcase"></i> Total Applications</h6>
+                    <h2 class="card-title mb-0" id="total-applications">{{ user.jobapplication_set.all.count }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card border-0 bg-light h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-calendar"></i> Applications</h6>
+                    <select class="form-select form-select-sm mb-2" id="month-selector">
+                      <option value="">This Month</option>
+                      {% for year, month, label in user.jobapplication_set.get_available_months %}
+                        <option value="{{ year }}-{{ month }}">{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <h2 class="card-title mb-0" id="monthly-applications">{{ user.jobapplication_set.get_month_stats }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card border-0 bg-light h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-clock"></i> Active Applications</h6>
+                    <h2 class="card-title mb-0" id="active-applications">{{ user.jobapplication_set.get_total_active }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card border-0 bg-light h-100">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-trophy"></i> Offers</h6>
+                    <h2 class="card-title mb-0" id="total-offers">{{ user.jobapplication_set.get_total_offers }}</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Details -->
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h6 class="card-title mb-3"><i class="bi bi-person-badge"></i> Account Details</h6>
+                <div class="mb-2"><strong>Username:</strong> {{ user.username }}</div>
+                <div class="mb-2"><strong>Email:</strong> {{ user.email }}</div>
+                <div class="mb-2"><strong>Member Since:</strong> {{ user.date_joined|date:"M d, Y" }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% block content %} {% endblock %}
+    <footer class="bg-dark text-light pt-5 pb-4">
+      <div class="container text-md-left">
+        <div class="row text-md-left">
+          <!-- About -->
+          <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">
+              JobNest
+            </h5>
+            <p>
+              Your personalized job application tracker. Organize your job hunt,
+              stay focused, and land your dream role.
+            </p>
+          </div>
+
+          <!-- Links -->
+          <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">
+              Quick Links
+            </h5>
+            <p><a href="{% if user.is_authenticated %}{% url 'after_login_homepage' %}{% else %}/{% endif %}" class="text-light text-decoration-none">Home</a></p>
+            <p>
+              <a href="{% url 'tracker:dashboard' %}" class="text-light text-decoration-none">Dashboard</a>
+            </p>
+            <p>
+              <a href="{% url 'resources:resource_list' %}" class="text-light text-decoration-none">Resources</a>
+            </p>
+            <p>
+              <a href="#" class="text-light text-decoration-none">Contact</a>
+            </p>
+          </div>
+
+          <!-- Socials -->
+          <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mt-3 text-center">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">
+              Follow Us
+            </h5>
+            <a href="#" class="text-light me-3"
+              ><i class="bi bi-github"></i
+            ></a>
+            <a href="#" class="text-light me-3"
+              ><i class="bi bi-twitter"></i
+            ></a>
+            <a href="#" class="text-light me-3"
+              ><i class="bi bi-instagram"></i
+            ></a>
+            <a href="#" class="text-light"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <!-- Copyright -->
+        <hr class="mb-4" />
+        <div class="row align-items-center">
+          <div class="col-md-7 col-lg-8">
+            <p class="text-center text-md-start">
+              © 2025 <strong class="text-warning">JobNest</strong>. All Rights
+              Reserved.
+            </p>
+          </div>
+          <div class="col-md-5 col-lg-4">
+            <p class="text-center text-md-end">Made with ❤️ by Lokesh and Team</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+    // Global function to update statistics
+    function updateAllStats() {
+      fetch('{% url "tracker:get_stats" %}')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('total-applications').textContent = data.total;
+          document.getElementById('active-applications').textContent = data.active;
+          document.getElementById('total-offers').textContent = data.offers;
+          if (!document.getElementById('month-selector').value) {
+            document.getElementById('monthly-applications').textContent = data.current_month;
+          }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const monthSelector = document.getElementById('month-selector');
+      const accountModal = document.getElementById('accountModal');
+
+      // Update stats when modal is shown
+      if (accountModal) {
+        accountModal.addEventListener('show.bs.modal', updateAllStats);
+      }
+
+      // Handle month selection changes
+      if (monthSelector) {
+        monthSelector.addEventListener('change', function() {
+          const value = this.value;
+          let url = '{% url "tracker:get_month_stats" %}';
+          if (value) {
+            const [year, month] = value.split('-');
+            url += `?year=${year}&month=${month}`;
+          }
+          
+          fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById('monthly-applications').textContent = data.count;
+            });
+        });
+      }
+
+      // Listen for custom event when job is added/edited/deleted
+      document.addEventListener('jobApplicationUpdated', function() {
+        updateAllStats();
+      });
+    });
+
+    // Add this to your add/edit/delete success handlers
+    function triggerStatsUpdate() {
+      document.dispatchEvent(new Event('jobApplicationUpdated'));
+    }
+
+    // Update your existing AJAX success handlers
+    document.getElementById('add-job-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch("", {
+        method: "POST",
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const job = data.job;
+          const cardHtml = renderJobCard(job);
+          document.getElementById('job-cards-row').insertAdjacentHTML('afterbegin', cardHtml);
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('addJobModal')).hide();
+          this.reset();
+          document.getElementById('add-form-errors').innerHTML = '';
+          showMessage('Job added successfully!','success');
+          triggerStatsUpdate(); // Update statistics
+        } else {
+          showFormErrors('add-form-errors', data.errors);
+        }
+      });
+    });
+
+    // Update edit form handler
+    document.getElementById('edit-job-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch("", {
+        method: "POST",
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          updateJobCard(data.job);
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('editJobModal')).hide();
+          showMessage('Job updated successfully!','success');
+          triggerStatsUpdate(); // Update statistics
+        } else {
+          showFormErrors('edit-form-errors', data.errors);
+        }
+      });
+    });
+
+    // Update delete handler
+    document.getElementById('delete-job-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      const jobId = document.getElementById('edit-job-id').value;
+      const formData = new FormData();
+      formData.append('delete_job_id', jobId);
+      fetch("", {
+        method: "POST",
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const card = document.getElementById('job-card-' + jobId);
+          if (card) card.remove();
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('editJobModal')).hide();
+          showMessage('Job deleted successfully!','success');
+          triggerStatsUpdate(); // Update statistics
+        }
+      });
+    });
+    </script>
+  </body>
+</html>

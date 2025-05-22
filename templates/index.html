@@ -6,29 +6,301 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Home Page</title>
-  <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+  <style>
+    :root {
+      --dark-bg: #1a1a1a;
+      --darker-bg: #121212;
+      --accent-color: #4CAF50;
+      --nav-bg: rgba(33, 37, 41, 0.95);
+      --feature-bg: rgba(255, 255, 255, 0.05);
+    }
+    body {
+      background-color: var(--dark-bg);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+    }
+    .navbar {
+      background-color: var(--nav-bg);
+      padding: 1rem 0;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .navbar.scrolled {
+      background-color: rgba(33, 37, 41, 0.98);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+    .navbar-brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .navbar-brand span {
+      color: var(--accent-color);
+      font-weight: 800;
+    }
+    .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      margin: 0 0.8rem;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .nav-link:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--accent-color);
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover:after {
+      width: 100%;
+    }
+    .nav-link.active:after {
+      width: 100%;
+    }
+    .nav-link:hover {
+      color: #fff !important;
+    }
+    .btn-custom {
+      background-color: var(--accent-color);
+      color: #fff !important;
+      padding: 0.6rem 1.8rem;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .btn-custom:hover {
+      background-color: transparent;
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+    .navbar-toggler {
+      border: none;
+      padding: 0.5rem;
+    }
+    .navbar-toggler:focus {
+      box-shadow: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    
+    /* Features Section Styling */
+    .features {
+      background: linear-gradient(135deg, rgba(33, 37, 41, 0.95), rgba(18, 18, 18, 0.97));
+      padding: 6rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .features::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    .value-props {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 0 auto;
+      max-width: 1200px;
+    }
+    .value-props li {
+      background: var(--feature-bg);
+      padding: 2.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: flex-start;
+      margin: 0;
+    }
+    .value-props li:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .value-props .feature-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(76, 175, 80, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1.5rem;
+      font-size: 1.5rem;
+      color: var(--accent-color);
+    }
+    .value-props .feature-content {
+      flex: 1;
+    }
+    .value-props .feature-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      color: #fff;
+    }
+    .value-props .feature-description {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+    .hero {
+      padding: 8rem 0 4rem;
+      background: linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+    }
+    .problem-solution {
+      padding: 4rem 0;
+    }
+    .feature-list {
+      background-color: var(--darker-bg);
+      padding: 4rem 0;
+    }
+    .built-different {
+      padding: 4rem 0;
+    }
+    .testimonial-sec {
+      background-color: var(--darker-bg);
+      padding: 6rem 0;
+    }
+    .testimonial blockquote {
+      background-color: rgba(255,255,255,0.05);
+      padding: 2.5rem;
+      border-radius: 15px;
+      margin-bottom: 0;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .testimonial blockquote::before {
+      content: '"';
+      position: absolute;
+      top: 20px;
+      left: 25px;
+      font-size: 4rem;
+      color: var(--accent-color);
+      opacity: 0.2;
+      font-family: serif;
+    }
+    .testimonial-content {
+      position: relative;
+      z-index: 1;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    .testimonial-author .author-info {
+      text-align: left;
+    }
+    .testimonial-author .author-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+    .testimonial-author .author-title {
+      color: var(--accent-color);
+      font-size: 0.95rem;
+    }
+    .final-cta {
+      padding: 7rem 0;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(33, 37, 41, 0.98), rgba(18, 18, 18, 0.99));
+    }
+    .go-btn {
+      background-color: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 200px;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+    }
+    .go-btn:hover {
+      background-color: #3d8b40;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+      color: #fff;
+      text-decoration: none;
+    }
+    .go-btn i {
+      margin-left: 10px;
+      font-size: 1.1rem;
+    }
+    footer {
+      background-color: var(--darker-bg);
+      padding: 2rem 0;
+      margin-top: 2rem;
+    }
+    .social-icon {
+      color: #fff;
+      margin: 0 0.5rem;
+      font-size: 1.2rem;
+      transition: color 0.3s ease;
+    }
+    .social-icon:hover {
+      color: var(--accent-color);
+    }
+  </style>
 </head>
 <body>
 
   <!-- Fixed Header -->
-  <header class="head">
-    <div class="header-info">
-      <a href="{% url 'home' %}" class="logo">Job<span>Nest</span></a>
-      <nav class="nav-links">
-        <a href="#" class="active">Home</a>
-        <a href="{% url 'login_page' %}" target="_blank" class="btn login">Login</a>
-        <a href="{% url 'signup' %}" target="_blank" class="btn sign-in">Signup</a>
-      </nav>
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand text-white" href="{% url 'home' %}">Job<span>Nest</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Home</a>
+          </li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-custom" href="{% url 'accounts:login' %}">Login</a>
+          </li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-custom" href="{% url 'accounts:signup' %}">Signup</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </header>
+  </nav>
 
   <!-- Main Content -->
   <main>
     <section class="hero">
-      <div class="container">
-        <h1>Track Your Job Hunt Like a Pro</h1>
-        <p class="subheading">
+      <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">Track Your Job Hunt Like a Pro</h1>
+        <p class="lead mb-5">
           Your personal job search dashboard.<br />
           Built for students, freshers, and professionals chasing their next opportunity.
         </p>
@@ -38,71 +310,151 @@
     <section class="features">
       <div class="container">
         <ul class="value-props">
-          <li>✅ Track applications Company, role, status, and notes.</li>
-          <li>🧠 Stay in control — Know where you’ve applied, what’s next, and what’s pending.</li>
-          <li>🧰 One tool, less chaos — No more spreadsheets. Just clarity.</li>
-          <li>📅 Stay Organized — Never miss a deadline or follow-up again.</li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">Track Applications</h3>
+              <p class="feature-description">Keep track of every company, role, status, and important notes in one place.</p>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">Stay in Control</h3>
+              <p class="feature-description">Know exactly where you've applied, what's next, and what's pending.</p>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-magic"></i>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">One Tool, Less Chaos</h3>
+              <p class="feature-description">Say goodbye to spreadsheets. Experience clarity in your job search.</p>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">Stay Organized</h3>
+              <p class="feature-description">Never miss a deadline or follow-up again with our smart reminders.</p>
+            </div>
+          </li>
         </ul>
       </div>
     </section>
 
     <section class="problem-solution">
-      <div class="info-container">
-        <h3>Job hunting is messy.</h3>
-        <p>Different portals. Lost deadlines. Forgotten follow-ups.</p>
-        <h3>JobNest makes it simple.</h3>
-        <p>
-          Keep everything in one clean, searchable, filterable dashboard — built for real job seekers like you.
-        </p>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8 text-center">
+            <h3 class="mb-4">Job hunting is messy.</h3>
+            <p class="lead mb-5">Different portals. Lost deadlines. Forgotten follow-ups.</p>
+            <h3 class="mb-4">JobNest makes it simple.</h3>
+            <p class="lead">
+              Keep everything in one clean, searchable, filterable dashboard — built for real job seekers like you.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="feature-list">
-      <div class="features-container">
-        <h1>HOW JOBNEST WILL HELP YOU!</h1>
-        <span id="element"></span>
+      <div class="container text-center">
+        <h1 class="mb-4">HOW JOBNEST WILL HELP YOU!</h1>
+        <span id="element" class="lead"></span>
       </div>
     </section>
 
     <section class="built-different">
-      <div class="uniq-container">
-        <h2>🧱 Built Different</h2>
-        <ul>
-          <li>Designed for real-world job seekers</li>
-          <li>UX focused — clean, fast, distraction-free</li>
-          <li>100% student-built</li>
-          <li>Privacy-first — we don’t share your data</li>
-        </ul>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <h2 class="mb-4">🧱 Built Different</h2>
+            <ul class="list-unstyled">
+              <li class="mb-3">✨ Designed for real-world job seekers</li>
+              <li class="mb-3">🎯 UX focused — clean, fast, distraction-free</li>
+              <li class="mb-3">👨‍💻 100% student-built</li>
+              <li class="mb-3">🔒 Privacy-first — we don't share your data</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="testimonial-sec">
-      <h1>Testimonials</h1>
-      <div class="testimonial">
-        <div class="testi-container">
-          <blockquote>
-            “I used to forget where I applied. Now I know exactly what’s happening — and when to follow up.”<br />
-            <span>— Anjali, Software Engineering Student</span>
-          </blockquote>
-        </div>
-        <div class="testi-container">
-          <blockquote>
-            “No more spreadsheets or messy notes. JobNest keeps my job applications in one place — it just works.”<br />
-            <span>— Ravi, UX Designer</span>
-          </blockquote>
+      <div class="container">
+        <h1 class="text-center mb-5">Testimonials</h1>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <blockquote>
+              <p class="testimonial-content">
+                "I used to forget where I applied. Now I know exactly what's happening — and when to follow up."
+              </p>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <div class="author-name">Anjali Singh</div>
+                  <div class="author-title">Software Engineering Student</div>
+                </div>
+              </div>
+            </blockquote>
+          </div>
+          <div class="col-md-6 mb-4">
+            <blockquote>
+              <p class="testimonial-content">
+                "No more spreadsheets or messy notes. JobNest keeps my job applications in one place — it just works."
+              </p>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <div class="author-name">Ravi</div>
+                  <div class="author-title">UX Designer</div>
+                </div>
+              </div>
+            </blockquote>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="final-cta">
       <div class="container">
-        <h2>Take control of your career.</h2>
-        <p>Start tracking smarter — with JobNest.</p>
-        <a href="{% url 'signup' %}" target="_blank"><button class="go-btn">Start Now</button></a>
+        <h2 class="display-5 mb-4">Take control of your career.</h2>
+        <p class="lead mb-5">Start tracking smarter — with JobNest.</p>
+        <a href="{% url 'accounts:signup' %}" class="go-btn">
+          Get Started <i class="fas fa-arrow-right"></i>
+        </a>
       </div>
     </section>
   </main>
 
+  <footer class="border-top border-secondary">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <p class="mb-1">&copy; 2025 JobNest. All Rights Reserved.</p>
+          <p class="mb-0">
+            <a href="privacy-policy.html" class="text-white text-decoration-none me-3">Privacy Policy</a>
+            <a href="terms-of-service.html" class="text-white text-decoration-none">Terms of Service</a>
+          </p>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <a href="https://github.com/yourusername" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+          <a href="#" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
+          <a href="#" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
+          <a href="#" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
   <script>
     var typed = new Typed("#element", {
@@ -112,41 +464,22 @@
         "Personal notes on every job",
         "Resume templates & resources",
         "Your data, secured & private",
-        "Works great on mobile & desktop"
+        "Works great on desktop",
+        "Works great on Mobile"
       ],
       typeSpeed: 25,
       loop: true,
     });
 
-
-      window.addEventListener('scroll', function() {
-      const header = document.querySelector('.head');
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
       if (window.scrollY > 50) {
-        header.classList.add('scrolled');
+        navbar.classList.add('scrolled');
       } else {
-        header.classList.remove('scrolled');
+        navbar.classList.remove('scrolled');
       }
     });
   </script>
-
-  <footer>
-    <div class="footer-container">
-      <div class="footer-info">
-        <p>&copy; 2025 JobNest. All Rights Reserved.</p>
-        <p>
-          <a href="privacy-policy.html">Privacy Policy</a> |
-          <a href="terms-of-service.html">Terms of Service</a>
-        </p>
-      </div>
-      <div class="footer-social">
-        <a href="https://github.com/yourusername" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
-        <a href="#" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
-        <a href="#" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
-        <a href="#" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
-        <a href="#" target="_blank" class="social-icon insta"><i class="fab fa-instagram"></i></a>
-      </div>
-    </div>
-  </footer>
 
 </body>
 </html>
