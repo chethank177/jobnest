@@ -74,6 +74,9 @@
             <li class="nav-item">
               <a class="nav-link {% if request.path == '/resources/' %}active{% endif %}" href="{% url 'resources:resource_list' %}">Resources</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/community/' %}active{% endif %}" href="{% url 'community:community' %}">Community</a>
+            </li>
             {% if user.is_authenticated %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

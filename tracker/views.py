@@ -103,15 +103,37 @@ def dashboard(request):
 def get_month_stats(request):
     year = request.GET.get('year')
     month = request.GET.get('month')
+    
     if year and month:
-        count = JobApplication.objects.filter(
+        year = int(year)
+        month = int(month)
+        jobs = JobApplication.objects.filter(
             user=request.user,
-            date_applied__year=int(year),
-            date_applied__month=int(month)
-        ).count()
+            date_applied__year=year,
+            date_applied__month=month
+        )
+        # Create a date object for the first day of the selected month
+        date_obj = datetime.date(year, month, 1)
+        formatted_date = date_obj.strftime("%B %Y")
+        
+        return JsonResponse({
+            'applications': jobs.count(),
+            'active': jobs.filter(status__in=['applied', 'interviewing']).count(),
+            'offers': jobs.filter(status='offer').count(),
+            'formatted_date': formatted_date
+        })
     else:
-        count = JobApplication.objects.get_month_stats()
-    return JsonResponse({'count': count})
+        # If no month/year specified, return current month stats
+        today = timezone.now()
+        jobs = JobApplication.objects.filter(user=request.user)
+        formatted_date = today.strftime("%B %Y")
+        
+        return JsonResponse({
+            'applications': jobs.get_month_stats(),
+            'active': jobs.get_total_active(),
+            'offers': jobs.get_total_offers(),
+            'formatted_date': formatted_date
+        })
 
 @login_required
 def get_stats(request):

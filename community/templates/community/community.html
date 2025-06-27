@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}JobNest | Community{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background-color: #000;
+    color: #fff;
+  }
+
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border-radius: 1rem;
+    border: 1px solid #444;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+
+  .card h2 {
+    font-size: 3rem;
+  }
+
+  .text-muted-light {
+    color: #ccc !important;
+  }
+
+  .lead {
+    color: #bbb;
+  }
+
+  .footer-note {
+  font-size: 1.7rem;
+  color:white;
+  }
+  .colcng{
+   font-weight: 500;
+   animation: colorCycle 10s infinite linear;
+   text-align: center;
+   color: #00CFFF; /* starting color */
+  }
+
+ @keyframes colorCycle {
+  0%   { color: #00CFFF; }  /* Sky Blue */
+  10%  { color: #00D88F; }  /* Emerald Green */
+  20%  { color: #FF6B6B; }  /* Coral Pink */
+  30%  { color: #FFC75F; }  /* Warm Yellow */
+  40%  { color: #8C52FF; }  /* Soft Purple */
+  50%  { color: #00FFCA; }  /* Aqua Mint */
+  60%  { color: #FF5DA2; }  /* Candy Pink */
+  70%  { color: #4FC3F7; }  /* Baby Blue */
+  80%  { color: #FFD700; }  /* Gold */
+  90%  { color: #FF9A00; }  /* Vibrant Orange */
+  100% { color: #00CFFF; }  /* Loop back to Sky Blue */
+}
+</style>
+
+<!-- Hero Section -->
+<div class="container py-5">
+  <div class="row justify-content-center text-center mb-5">
+    <div class="col-lg-8">
+      <h1 class="display-4 fw-bold mb-3">Welcome to the JobNest Community</h1>
+      <p class="lead">Connect, learn, and grow with fellow job seekers</p>
+    </div>
+  </div>
+
+  <!-- Feature Cards -->
+  <div class="row g-4 py-4">
+    <div class="col-md-4">
+      <div class="card h-100 bg-dark text-white">
+        <div class="card-body text-center">
+          <h2>💬</h2>
+          <h3 class="card-title h4">Discussions</h3>
+          <p class="text-muted-light colcng">Coming Soon</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 bg-dark text-white">
+        <div class="card-body text-center">
+          <h2>📎</h2>
+          <h3 class="card-title h4">Resume Review</h3>
+          <p class="text-muted-light colcng">Coming Soon</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 bg-dark text-white">
+        <div class="card-body text-center">
+          <h2>🧠</h2>
+          <h3 class="card-title h4">Peer Advice</h3>
+          <p class="text-muted-light colcng">Coming Soon</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Message -->
+  <div class="row justify-content-center text-center mt-5">
+    <div class="col-lg-8">
+      <p class="footer-note">✨ More features are on the way. Stay connected!</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

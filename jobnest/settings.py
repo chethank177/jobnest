@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'accounts',
     'tracker',
     'resources',
+    'community',
 ]
 
 MIDDLEWARE = [

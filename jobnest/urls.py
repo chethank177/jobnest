@@ -26,6 +26,7 @@ urlpatterns = [
     path('tracker/', include('tracker.urls')),
     path('home/', views.after_login_homepage, name='after_login_homepage'),
     path('resources/', include('resources.urls', namespace='resources')),
+    path('community/', include('community.urls', namespace='community')),
     
     
     
