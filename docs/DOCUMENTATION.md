@@ -1,23 +1,106 @@
 # JobNest - Job Application Tracking System Documentation
 
 ## Project Overview
-JobNest is a Django-based web application designed to help job seekers track and manage their job applications efficiently. The application provides a modern, user-friendly interface with real-time updates and comprehensive statistics.
+JobNest is a modern Django web application that helps job seekers efficiently track, manage, and analyze their job applications. It features a dashboard for job tracking, categorized resource sharing, and user account management—all with a responsive, interactive UI and real-time updates.
 
-## Project Structure
+---
+
+## Project Structure (Directory Map)
 ```
-jobnest_site/              # Project root directory
-├── docs/                  # Documentation folder (you are here)
-│   └── README.md         # This documentation file
-├── jobnest/              # Main Django project directory
-│   ├── accounts/         # User authentication app
-│   ├── resources/        # Resource sharing app
-│   ├── tracker/          # Main job tracking app
-│   ├── static/           # Static files
-│   ├── templates/        # Global templates
-│   └── manage.py         # Django management script
-├── .venv/                # Virtual environment
-└── requirements.txt      # Project dependencies
+jobnest/                  # Project root
+├── accounts/             # User authentication and profile management
+├── community/            # (Optional) Community features (e.g., forums)
+├── resources/            # Resource sharing, categories, and comments
+│   ├── templates/resources/   # Resource-related templates
+│   ├── models.py         # Resource and Comment models
+│   ├── views.py          # Resource list/detail/add/edit/delete views
+│   └── ...
+├── tracker/              # Job application tracking core app
+│   ├── templates/tracker/     # Dashboard and job modals
+│   ├── models.py         # JobApplication model and manager
+│   ├── views.py          # Dashboard, stats, AJAX endpoints
+│   └── ...
+├── static/               # Static files (CSS, JS, images)
+├── templates/            # Global templates (base.html, etc.)
+├── docs/                 # Project documentation
+│   └── DOCUMENTATION.md  # This documentation file
+├── manage.py             # Django management script
+├── requirements.txt      # Python dependencies
+└── db.sqlite3            # SQLite database (dev)
 ```
+
+---
+
+## Application Modules
+
+### 1. **tracker**
+- **Purpose:** Core job application management (add, edit, delete, status, notes, stats)
+- **Key Features:**
+  - Dashboard with job cards and filters
+  - AJAX-powered add/edit/delete (no reload)
+  - Real-time statistics (total, active, offers, rejected)
+  - Modals for job CRUD
+
+### 2. **resources**
+- **Purpose:** Share and browse categorized resources (Resume, Job Portal, Interview, Cover Letter, Other)
+- **Key Features:**
+  - Category tabs with resource cards
+  - Comment system for each resource
+  - Admin add/edit/delete
+  - Shows "No resources available" only when truly empty
+
+### 3. **accounts**
+- **Purpose:** User authentication and profile management
+- **Key Features:**
+  - Registration, login, logout
+  - My Account modal with live stats
+  - Profile details
+
+### 4. **community** (optional)
+- **Purpose:** Community features (e.g., forums, discussions)
+- **Status:** Placeholder for future expansion
+
+---
+
+## High-Level Features
+- **Job Application Tracking:** Add, edit, delete, and filter job applications with status and notes
+- **Statistics Dashboard:** Live stats for total, active, offers, and rejected applications
+- **Resource Library:** Browse and manage categorized resources with comments
+- **User Management:** Secure authentication, profile, and account stats
+- **Responsive UI:** Bootstrap 5, modals, and AJAX for a modern experience
+- **Security:** CSRF protection, secure forms, user access control
+
+---
+
+## How It Works (User Flow)
+1. **Login/Register:** Users create an account or log in
+2. **Dashboard:** Users see all their job applications, can add new ones, edit, or delete
+3. **Statistics:** Stats update live as jobs are managed
+4. **Resources:** Users browse resources by category, add comments, and admins can manage resources
+5. **My Account:** Modal shows user info and live-updating stats
+
+---
+
+## Quickstart
+1. Clone the repo and set up a virtual environment
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run migrations: `python manage.py migrate`
+4. Create a superuser: `python manage.py createsuperuser`
+5. Start the server: `python manage.py runserver`
+6. Access the site at `http://localhost:8000/`
+
+---
+
+## For Developers
+- **tracker/models.py:** JobApplication model and manager for stats
+- **resources/models.py:** Resource and Comment models
+- **AJAX:** Used for job CRUD and stats updates (see dashboard.html)
+- **Custom template tags:** Used for category lookups in resources
+- **All category tabs work even for empty categories (shows message only if truly empty)**
+
+---
+
+For more details, see the rest of this DOCUMENTATION.md.
 
 ## Technology Stack
 

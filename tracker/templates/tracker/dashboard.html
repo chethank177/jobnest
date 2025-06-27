@@ -97,7 +97,7 @@
               {{ job.get_status_display }}
             </span>
           </div>
-          <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-{{ job.id }}">{{ job.date_applied }}</span></p>
+          <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-{{ job.id }}">{{ job.date_applied|date:'j F Y' }}</span></p>
           {% if job.notes %}<p class="mb-2 small text-secondary"><i class="bi bi-chat-left-text me-1"></i> <span id="notes-{{ job.id }}">{{ job.notes }}</span></p>{% endif %}
           <div class="mt-auto d-flex gap-2 justify-content-end">
             {% if job.job_url %}
@@ -267,6 +267,7 @@ addJobForm.addEventListener('submit', function(e) {
       document.getElementById('add-form-errors').innerHTML = '';
       showMessage('Job added successfully!','success');
       updateProfileStats();
+      document.dispatchEvent(new Event('jobApplicationUpdated'));
     } else {
       showFormErrors('add-form-errors', data.errors);
     }
@@ -315,6 +316,7 @@ editJobForm.addEventListener('submit', function(e) {
       bootstrap.Modal.getOrCreateInstance(editJobModal).hide();
       showMessage('Job updated successfully!','success');
       updateProfileStats();
+      document.dispatchEvent(new Event('jobApplicationUpdated'));
     } else {
       showFormErrors('edit-form-errors', data.errors);
     }
@@ -341,6 +343,7 @@ deleteBtn.addEventListener('click', function(e) {
       bootstrap.Modal.getOrCreateInstance(editJobModal).hide();
       showMessage('Job deleted successfully!','success');
       updateProfileStats();
+      document.dispatchEvent(new Event('jobApplicationUpdated'));
     }
   });
 });
@@ -351,6 +354,19 @@ function renderJobCard(job) {
   if (job.status === 'interviewing') badgeClass = 'bg-info text-dark';
   else if (job.status === 'offer') badgeClass = 'bg-warning text-dark';
   else if (job.status === 'rejected') badgeClass = 'bg-danger';
+
+  // Format date_applied to 'd F Y' (e.g., '17 June 2025')
+  let formattedDate = job.date_applied;
+  if (job.date_applied) {
+    const dateObj = new Date(job.date_applied);
+    if (!isNaN(dateObj)) {
+      const day = dateObj.getDate();
+      const month = dateObj.toLocaleString('default', { month: 'long' });
+      const year = dateObj.getFullYear();
+      formattedDate = `${day} ${month} ${year}`;
+    }
+  }
+
   return `<div class="col-md-6 col-lg-4 job-card-col" id="job-card-${job.id}">
     <div class="card shadow-lg border-0 h-100 rounded-4">
       <div class="card-body d-flex flex-column position-relative">
@@ -361,7 +377,7 @@ function renderJobCard(job) {
           </div>
           <span class="badge position-absolute top-0 end-0 mt-3 me-3 px-3 py-2 fs-6 ${badgeClass}" id="status-badge-${job.id}">${badgeText}</span>
         </div>
-        <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-${job.id}">${job.date_applied}</span></p>
+        <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-${job.id}">${formattedDate}</span></p>
         ${job.notes ? `<p class="mb-2 small text-secondary"><i class="bi bi-chat-left-text me-1"></i> <span id="notes-${job.id}">${job.notes}</span></p>` : ''}
         <div class="mt-auto d-flex gap-2 justify-content-end">
           ${job.job_url ? `<a href="${job.job_url}" target="_blank" class="btn btn-outline-primary btn-sm" id="job-url-btn-${job.id}"><i class="bi bi-box-arrow-up-right"></i> View Job</a>` : ''}
@@ -404,7 +420,7 @@ function updateProfileStats() {
     .then(response => response.json())
     .then(data => {
       document.getElementById('total-applications').textContent = data.total;
-      document.getElementById('monthly-applications').textContent = data.monthly;
+      document.getElementById('rejected-applications').textContent = data.rejected;
       document.getElementById('active-applications').textContent = data.active;
       document.getElementById('total-offers').textContent = data.offers;
     });

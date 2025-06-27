@@ -170,14 +170,8 @@
               <div class="col-6">
                 <div class="card border-0 bg-light h-100">
                   <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-calendar"></i> Applications</h6>
-                    <select class="form-select form-select-sm mb-2" id="month-selector">
-                      <option value="">This Month</option>
-                      {% for year, month, label in user.jobapplication_set.get_available_months %}
-                        <option value="{{ year }}-{{ month }}">{{ label }}</option>
-                      {% endfor %}
-                    </select>
-                    <h2 class="card-title mb-0" id="monthly-applications">{{ user.jobapplication_set.get_month_stats }}</h2>
+                    <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-x-circle"></i> Rejected Applications</h6>
+                    <h2 class="card-title mb-0" id="rejected-applications">{{ user.jobapplication_set.get_total_rejected }}</h2>
                   </div>
                 </div>
               </div>
@@ -293,7 +287,8 @@
           document.getElementById('total-applications').textContent = data.total;
           document.getElementById('active-applications').textContent = data.active;
           document.getElementById('total-offers').textContent = data.offers;
-          if (!document.getElementById('month-selector').value) {
+          document.getElementById('rejected-applications').textContent = data.rejected;
+          if (!document.getElementById('month-selector')) {
             document.getElementById('monthly-applications').textContent = data.current_month;
           }
         });
@@ -336,76 +331,6 @@
     function triggerStatsUpdate() {
       document.dispatchEvent(new Event('jobApplicationUpdated'));
     }
-
-    // Update your existing AJAX success handlers
-    
-      const formData = new FormData(this);
-      fetch("", {
-        method: "POST",
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
-        body: formData
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          const job = data.job;
-          const cardHtml = renderJobCard(job);
-          document.getElementById('job-cards-row').insertAdjacentHTML('afterbegin', cardHtml);
-          bootstrap.Modal.getOrCreateInstance(document.getElementById('addJobModal')).hide();
-          this.reset();
-          document.getElementById('add-form-errors').innerHTML = '';
-          showMessage('Job added successfully!','success');
-          triggerStatsUpdate(); // Update statistics
-        } else {
-          showFormErrors('add-form-errors', data.errors);
-        }
-      });
-    });
-
-    // Update edit form handler
-    document.getElementById('edit-job-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch("", {
-        method: "POST",
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
-        body: formData
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          updateJobCard(data.job);
-          bootstrap.Modal.getOrCreateInstance(document.getElementById('editJobModal')).hide();
-          showMessage('Job updated successfully!','success');
-          triggerStatsUpdate(); // Update statistics
-        } else {
-          showFormErrors('edit-form-errors', data.errors);
-        }
-      });
-    });
-
-    // Update delete handler
-    document.getElementById('delete-job-btn').addEventListener('click', function(e) {
-      e.preventDefault();
-      const jobId = document.getElementById('edit-job-id').value;
-      const formData = new FormData();
-      formData.append('delete_job_id', jobId);
-      fetch("", {
-        method: "POST",
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
-        body: formData
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          const card = document.getElementById('job-card-' + jobId);
-          if (card) card.remove();
-          bootstrap.Modal.getOrCreateInstance(document.getElementById('editJobModal')).hide();
-          showMessage('Job deleted successfully!','success');
-          triggerStatsUpdate(); // Update statistics
-        }
-      });
-    });
     </script>
   </body>
 </html>

@@ -28,6 +28,10 @@ class JobApplicationManager(models.Manager):
         """Returns count of applications with offer status"""
         return self.filter(status='offer').count()
 
+    def get_total_rejected(self):
+        """Returns count of applications with rejected status"""
+        return self.filter(status='rejected').count()
+
     def this_month(self):
         today = timezone.now()
         return self.filter(date_applied__year=today.year, date_applied__month=today.month)

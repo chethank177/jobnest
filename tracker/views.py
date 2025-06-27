@@ -142,6 +142,7 @@ def get_stats(request):
         'total': jobs.count(),
         'active': jobs.get_total_active(),
         'offers': jobs.get_total_offers(),
+        'rejected': jobs.get_total_rejected(),
         'current_month': jobs.get_month_stats()
     })
 
@@ -153,4 +154,5 @@ def profile_stats(request):
         'monthly': user.jobapplication_set.get_month_stats(),
         'active': user.jobapplication_set.get_total_active(),
         'offers': user.jobapplication_set.get_total_offers(),
+        'rejected': user.jobapplication_set.get_total_rejected(),
     })

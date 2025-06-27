@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load resource_filters %}
 {% block title %}Resources | JobNest{% endblock %}
 {% block content %}
 <div class="container py-4">
@@ -18,22 +19,24 @@
         <span class="category-name">All</span>
       </button>
       {% for cat_code, cat_name in categories %}
-      <button class="category-tab" id="tab-{{ cat_code }}" data-bs-toggle="tab" data-bs-target="#tab-content-{{ cat_code }}">
-        <span class="category-icon">
-          {% if cat_code == 'Resume' %}
-            <i class="bi bi-file-earmark-person"></i>
-          {% elif cat_code == 'Job Portal' %}
-            <i class="bi bi-globe"></i>
-          {% elif cat_code == 'Interview' %}
-            <i class="bi bi-people"></i>
-          {% elif cat_code == 'Cover Letter' %}
-            <i class="bi bi-envelope"></i>
-          {% else %}
-            <i class="bi bi-folder"></i>
-          {% endif %}
-        </span>
-        <span class="category-name">{{ cat_name }}</span>
-      </button>
+        {% with cat_id=cat_code|slugify %}
+          <button class="category-tab" id="tab-{{ cat_id }}" data-bs-toggle="tab" data-bs-target="#tab-content-{{ cat_id }}">
+            <span class="category-icon">
+              {% if cat_code == 'Resume' %}
+                <i class="bi bi-file-earmark-person"></i>
+              {% elif cat_code == 'Job Portal' %}
+                <i class="bi bi-globe"></i>
+              {% elif cat_code == 'Interview' %}
+                <i class="bi bi-people"></i>
+              {% elif cat_code == 'Cover Letter' %}
+                <i class="bi bi-envelope"></i>
+              {% else %}
+                <i class="bi bi-folder"></i>
+              {% endif %}
+            </span>
+            <span class="category-name">{{ cat_name }}</span>
+          </button>
+        {% endwith %}
       {% endfor %}
     </div>
   </div>
@@ -83,60 +86,52 @@
     
     <!-- Individual Category Tabs -->
     {% for cat_code, cat_name in categories %}
-    <div class="tab-pane fade" id="tab-content-{{ cat_code }}" role="tabpanel" aria-labelledby="tab-{{ cat_code }}">
-      <div class="row g-4">
-        {% with has_resources=False %}
-          <!-- Find resources for this category -->
-          {% for cat, resources in grouped.items %}
-            {% if cat == cat_code %}
-              {% if resources %}
-                {% with has_resources=True %}
-                  {% for resource in resources %}
-                    <div class="col-12 col-md-6 col-lg-4 resource-card-wrapper">
-                      <div class="card h-100 resource-card">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ resource.title }}</h5>
-                          <p class="card-text description-preview">
-                            {% if resource.description %}
-                              {{ resource.description|truncatechars:200 }}
-                            {% else %}
-                              No description available.
-                            {% endif %}
-                          </p>
-                          <div class="d-flex justify-content-between align-items-center mt-3">
-                            <a href="{% url 'resources:resource_detail' resource.pk %}" class="btn btn-primary read-more-btn" target="_blank">Read More</a>
-                            <small class="text-muted">{{ resource.created_at|date:'M d, Y' }}</small>
-                          </div>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                          <div class="d-flex justify-content-between align-items-center">
-                            <span class="author"><i class="bi bi-person"></i> {{ resource.created_by.username }}</span>
-                            <span class="comments-count"><i class="bi bi-chat-dots"></i> {{ resource.comments.count }}</span>
-                          </div>
-                          
-                          {% if user.is_staff %}
-                          <div class="mt-2 d-flex gap-2 justify-content-end">
-                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resourceEditModal{{ resource.pk }}"><i class="bi bi-pencil"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resourceDeleteModal{{ resource.pk }}"><i class="bi bi-trash"></i> Delete</button>
-                          </div>
+      {% with cat_id=cat_code|slugify %}
+        <div class="tab-pane fade" id="tab-content-{{ cat_id }}" role="tabpanel" aria-labelledby="tab-{{ cat_id }}">
+          <div class="row g-4">
+            {% with resources=grouped|get_item:cat_code %}
+              {% if resources and resources|length > 0 %}
+                {% for resource in resources %}
+                  <div class="col-12 col-md-6 col-lg-4 resource-card-wrapper">
+                    <div class="card h-100 resource-card">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ resource.title }}</h5>
+                        <p class="card-text description-preview">
+                          {% if resource.description %}
+                            {{ resource.description|truncatechars:200 }}
+                          {% else %}
+                            No description available.
                           {% endif %}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                          <a href="{% url 'resources:resource_detail' resource.pk %}" class="btn btn-primary read-more-btn" target="_blank">Read More</a>
+                          <small class="text-muted">{{ resource.created_at|date:'M d, Y' }}</small>
                         </div>
                       </div>
+                      <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="author"><i class="bi bi-person"></i> {{ resource.created_by.username }}</span>
+                          <span class="comments-count"><i class="bi bi-chat-dots"></i> {{ resource.comments.count }}</span>
+                        </div>
+                        {% if user.is_staff %}
+                        <div class="mt-2 d-flex gap-2 justify-content-end">
+                          <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resourceEditModal{{ resource.pk }}"><i class="bi bi-pencil"></i> Edit</button>
+                          <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resourceDeleteModal{{ resource.pk }}"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                        {% endif %}
+                      </div>
                     </div>
-                  {% endfor %}
-                {% endwith %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="col-12 text-center py-5">
+                  <p class="text-muted">No resources available in this category.</p>
+                </div>
               {% endif %}
-            {% endif %}
-          {% endfor %}
-          
-          {% if has_resources == False %}
-            <div class="col-12 text-center py-5">
-              <p class="text-muted">No resources available in this category.</p>
-            </div>
-          {% endif %}
-        {% endwith %}
-      </div>
-    </div>
+            {% endwith %}
+          </div>
+        </div>
+      {% endwith %}
     {% endfor %}
   </div>
 
