@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}JobNest | Community{% endblock %}
-
+{% block extra_css %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}
 {% block content %}
 <style>
   body {
@@ -36,12 +38,13 @@
   .footer-note {
   font-size: 1.7rem;
   color:white;
+  animation: colorCycle 15s infinite linear 2s;
+
   }
-  .colcng{
+  .clrChange{
    font-weight: 500;
-   animation: colorCycle 10s infinite linear;
    text-align: center;
-   color: #00CFFF; /* starting color */
+   color: #00D88F !important; /* starting color */
   }
 
  @keyframes colorCycle {
@@ -63,8 +66,8 @@
 <div class="container py-5">
   <div class="row justify-content-center text-center mb-5">
     <div class="col-lg-8">
-      <h1 class="display-4 fw-bold mb-3">Welcome to the JobNest Community</h1>
-      <p class="lead">Connect, learn, and grow with fellow job seekers</p>
+      <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">Welcome to the JobNest Community</h1>
+      <p class="lead animate__animated animate__fadeIn animate__delay-1s">Connect, learn, and grow with fellow job seekers</p>
     </div>
   </div>
 
@@ -75,7 +78,7 @@
         <div class="card-body text-center">
           <h2>💬</h2>
           <h3 class="card-title h4">Discussions</h3>
-          <p class="text-muted-light colcng">Coming Soon</p>
+          <p class="text-muted-light clrChange">Coming Soon</p>
         </div>
       </div>
     </div>
@@ -84,7 +87,7 @@
         <div class="card-body text-center">
           <h2>📎</h2>
           <h3 class="card-title h4">Resume Review</h3>
-          <p class="text-muted-light colcng">Coming Soon</p>
+          <p class="text-muted-light clrChange">Coming Soon</p>
         </div>
       </div>
     </div>
@@ -93,7 +96,7 @@
         <div class="card-body text-center">
           <h2>🧠</h2>
           <h3 class="card-title h4">Peer Advice</h3>
-          <p class="text-muted-light colcng">Coming Soon</p>
+          <p class="text-muted-light clrChange">Coming Soon</p>
         </div>
       </div>
     </div>
