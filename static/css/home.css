@@ -349,7 +349,7 @@ footer {
   margin-bottom: 2rem;
 }
 .add-job-btn {
-  background: #2563eb;
+  background: #243f78;
   color: #fff;
   padding: 0.5rem 1.5rem;
   border-radius: 6px;
@@ -365,7 +365,7 @@ footer {
 .job-card {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 0 20px 5px #a020f0;
   padding: 1.5rem;
   position: relative;
   min-height: 180px;

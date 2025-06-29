@@ -2,13 +2,35 @@
 {% load static %}
 {% block title %}Dashboard | JobNest{% endblock %}
 {% block content %}
+<style>
+.bg-nature {
+    background-color: #2C6259 !important;
+    color: white !important;
+}
+
+.bg-purple {
+    background-color:rgba(120, 53, 221, 0.75) !important;
+    color: white !important;
+}
+
+.bg-orange {
+    background-color: #F97316 !important;
+    color: white !important;
+}
+
+.bg-pink {
+    background-color: #F43F5E !important;
+    color: white !important;
+}
+
+</style>
 <div class="container py-5">
   <div id="dashboard-messages"></div>
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">Job Applications</h2>
     <div>
-      <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#filterModal"><i class="bi bi-funnel"></i> Filter</button>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobModal">Add Job</button>
+      <button class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#filterModal"><i class="bi bi-funnel"></i> Filter</button>
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addJobModal">Add Job</button>
     </div>
   </div>
   <!-- Filter Modal -->
@@ -87,11 +109,13 @@
               <h5 class="card-title fw-bold mb-1">{{ job.role }}</h5>
               <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
             </div>
+            
+            <!-- Badges Colors -->
             <span class="badge position-absolute top-0 end-0 mt-3 me-3 px-3 py-2 fs-6
-              {% if job.status == 'applied' %}bg-success
-              {% elif job.status == 'interviewing' %}bg-info text-dark
-              {% elif job.status == 'offer' %}bg-warning text-dark
-              {% elif job.status == 'rejected' %}bg-danger
+              {% if job.status == 'applied' %}bg-nature
+              {% elif job.status == 'interviewing' %}bg-purple text-dark
+              {% elif job.status == 'offer' %}bg-orange text-dark
+              {% elif job.status == 'rejected' %}bg-pink
               {% endif %}"
               id="status-badge-{{ job.id }}">
               {{ job.get_status_display }}
@@ -163,8 +187,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Add Job</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Add Job</button>
         </div>
       </form>
     </div>
@@ -350,7 +374,6 @@ deleteBtn.addEventListener('click', function(e) {
 // Render job card HTML
 function renderJobCard(job) {
   let badgeClass = 'bg-success';
-  let badgeText = job.status_display;
   if (job.status === 'interviewing') badgeClass = 'bg-info text-dark';
   else if (job.status === 'offer') badgeClass = 'bg-warning text-dark';
   else if (job.status === 'rejected') badgeClass = 'bg-danger';
@@ -375,7 +398,7 @@ function renderJobCard(job) {
             <h5 class="card-title fw-bold mb-1">${job.role}</h5>
             <h6 class="card-subtitle mb-2 text-muted">${job.company}</h6>
           </div>
-          <span class="badge position-absolute top-0 end-0 mt-3 me-3 px-3 py-2 fs-6 ${badgeClass}" id="status-badge-${job.id}">${badgeText}</span>
+          <span class="badge position-absolute top-0 end-0 mt-3 me-3 px-3 py-2 fs-6 ${badgeClass}" id="status-badge-${job.id}">${job.status_display}</span>
         </div>
         <p class="mb-1 small"><i class="bi bi-calendar-check me-1"></i> <strong>Applied:</strong> <span id="date-applied-${job.id}">${formattedDate}</span></p>
         ${job.notes ? `<p class="mb-2 small text-secondary"><i class="bi bi-chat-left-text me-1"></i> <span id="notes-${job.id}">${job.notes}</span></p>` : ''}
